@@ -1,0 +1,48 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/sznl?serverTimezone=GMT%2b8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: "010125"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+app:
+  auth:
+    token-ttl-minutes: 120
+
+external:
+  api:
+    weather:
+      base-url: https://devapi.qweather.com
+      api-key: ${WEATHER_API_KEY:your-weather-api-key}
+      timeout-seconds: 10
+    emission-factor:
+      base-url: https://emf.epa.gov
+      api-key: ${EMISSION_FACTOR_API_KEY:your-emission-factor-api-key}
+      timeout-seconds: 15
+    remote-sensing:
+      base-url: https://appeears.earthdatacloud.nasa.gov
+      api-key: ${REMOTE_SENSING_API_KEY:your-remote-sensing-api-key}
+      timeout-seconds: 30
+    soil:
+      base-url: https://rest.isric.org
+      api-key: ${SOIL_API_KEY:your-soil-api-key}
+      timeout-seconds: 20
+    energy:
+      base-url: ${ENERGY_API_BASE_URL:}
+      api-key: ${ENERGY_API_KEY:your-energy-api-key}
+      timeout-seconds: 10
