@@ -31,6 +31,12 @@ frontend/dist/
 .env.local
 .env.*.local
 
+# 敏感配置文件
+application-secrets.yml
+application-secrets.yaml
+*-secrets.yml
+*-secrets.yaml
+
 # Trae IDE 内部配置（保留 rules 和 skills）
 .trae/workspace*
 

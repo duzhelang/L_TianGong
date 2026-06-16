@@ -3,25 +3,37 @@ package com.ecocarbon.mrv.ai;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class AiService {
 
-    @Value("${app.ai.enabled:false}")
-    private boolean aiEnabled;
+    @Autowired
+    private AiProviderConfig config;
 
-    @Value("${app.ai.provider:local}")
-    private String aiProvider;
+    @Autowired
+    private AiClient aiClient;
 
     public String chat(String systemPrompt, String userMessage) {
-        if (!aiEnabled) {
+        if (!config.isEnabled()) {
             return "AI功能未启用，请在配置中设置 app.ai.enabled=true";
         }
         try {
             return callLLM(systemPrompt, userMessage);
+        } catch (Exception e) {
+            log.error("AI调用失败: {}", e.getMessage());
+            return "AI服务暂时不可用，请稍后再试";
+        }
+    }
+
+    public String chat(String provider, String model, String systemPrompt, String userMessage) {
+        if (!config.isEnabled()) {
+            return "AI功能未启用，请在配置中设置 app.ai.enabled=true";
+        }
+        try {
+            return callLLMWithProvider(provider, model, systemPrompt, userMessage);
         } catch (Exception e) {
             log.error("AI调用失败: {}", e.getMessage());
             return "AI服务暂时不可用，请稍后再试";
@@ -56,11 +68,37 @@ public class AiService {
     }
 
     private String callLLM(String systemPrompt, String userMessage) {
-        // 本地模式：基于规则的简单回复
-        if ("local".equals(aiProvider)) {
+        String provider = config.getDefaultProvider();
+        return callLLMWithProvider(provider, null, systemPrompt, userMessage);
+    }
+
+    private String callLLMWithProvider(String providerName, String modelName,
+                                        String systemPrompt, String userMessage) {
+        AiProviderConfig.ProviderConfig provider = config.getProviders().get(providerName);
+        if (provider == null) {
+            log.warn("未找到AI提供商: {}，使用本地模式", providerName);
             return generateLocalResponse(userMessage);
         }
-        // TODO: 集成外部LLM API（OpenAI/通义千问等）
+
+        String model = modelName != null ? modelName : provider.getDefaultModel();
+        if (model == null || model.isEmpty()) {
+            log.warn("提供商 {} 未配置默认模型", providerName);
+            return generateLocalResponse(userMessage);
+        }
+
+        String response = aiClient.callChatCompletion(
+                provider.getBaseUrl(),
+                provider.getApiKey(),
+                model,
+                systemPrompt,
+                userMessage
+        );
+
+        if (response != null) {
+            return response;
+        }
+
+        log.warn("AI API调用失败，使用本地模式");
         return generateLocalResponse(userMessage);
     }
 
