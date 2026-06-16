@@ -74,7 +74,12 @@ public class AiService {
 
     private String callLLMWithProvider(String providerName, String modelName,
                                         String systemPrompt, String userMessage) {
-        AiProviderConfig.ProviderConfig provider = config.getProviders().get(providerName);
+        Map<String, AiProviderConfig.ProviderConfig> providers = config.getProviders();
+        if (providers == null || providers.isEmpty()) {
+            log.warn("未配置AI提供商，使用本地模式");
+            return generateLocalResponse(userMessage);
+        }
+        AiProviderConfig.ProviderConfig provider = providers.get(providerName);
         if (provider == null) {
             log.warn("未找到AI提供商: {}，使用本地模式", providerName);
             return generateLocalResponse(userMessage);

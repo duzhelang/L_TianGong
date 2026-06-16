@@ -102,6 +102,10 @@ public class ExternalApiClient {
         try {
             String response = requestSupplier.get()
                     .block(Duration.ofSeconds(timeoutSeconds));
+            if (response == null) {
+                log.error("外部API {} 调用返回空响应", method);
+                throw new ExternalApiException("外部API " + method + " 调用返回空响应");
+            }
             return objectMapper.readTree(response);
         } catch (WebClientResponseException e) {
             log.error("外部API {} 调用失败: {} - {}", method, e.getStatusCode(), e.getResponseBodyAsString());
