@@ -1,0 +1,170 @@
+/* Data Platform - Futuristic Tech Style */
+/* Brand prefix: dp */
+
+:root {
+  /* Primary color: Cyan */
+  --dp-primary: #00FFFF;
+  --dp-primary-50: #E0FFFF;
+  --dp-primary-100: #B3FFFF;
+  --dp-primary-200: #80FFFF;
+  --dp-primary-300: #4DFFFF;
+  --dp-primary-400: #1AFFFF;
+  --dp-primary-500: #00FFFF;
+  --dp-primary-600: #00E6E6;
+  --dp-primary-700: #00CCCC;
+  --dp-primary-800: #00B3B3;
+  --dp-primary-900: #009999;
+  --dp-primary-950: #007373;
+
+  /* Neutral colors */
+  --dp-neutral-50: #F8FAFC;
+  --dp-neutral-100: #F1F5F9;
+  --dp-neutral-200: #E2E8F0;
+  --dp-neutral-300: #CBD5E1;
+  --dp-neutral-400: #94A3B8;
+  --dp-neutral-500: #64748B;
+  --dp-neutral-600: #475569;
+  --dp-neutral-700: #334155;
+  --dp-neutral-800: #1E293B;
+  --dp-neutral-900: #0F172A;
+  --dp-neutral-950: #020617;
+
+  /* Background colors */
+  --dp-bg-primary: #0F172A;
+  --dp-bg-secondary: #1E293B;
+  --dp-bg-tertiary: #334155;
+  --dp-bg-elevated: #1E293B;
+  --dp-bg-overlay: rgba(15, 23, 42, 0.8);
+
+  /* Text colors */
+  --dp-text-primary: #F8FAFC;
+  --dp-text-secondary: #CBD5E1;
+  --dp-text-tertiary: #94A3B8;
+  --dp-text-muted: #64748B;
+  --dp-text-inverse: #0F172A;
+
+  /* Border colors */
+  --dp-border-default: #334155;
+  --dp-border-strong: #475569;
+  --dp-border-subtle: #1E293B;
+  --dp-border-focus: #00FFFF;
+
+  /* Status colors */
+  --dp-state-success: #10B981;
+  --dp-state-warning: #F59E0B;
+  --dp-state-error: #EF4444;
+  --dp-state-info: #3B82F6;
+
+  /* Typography */
+  --dp-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  --dp-font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Font sizes */
+  --dp-text-xs: 0.75rem;
+  --dp-text-sm: 0.875rem;
+  --dp-text-base: 1rem;
+  --dp-text-lg: 1.125rem;
+  --dp-text-xl: 1.25rem;
+  --dp-text-2xl: 1.5rem;
+  --dp-text-3xl: 1.875rem;
+  --dp-text-4xl: 2.25rem;
+  --dp-text-5xl: 3rem;
+
+  /* Font weights */
+  --dp-font-light: 300;
+  --dp-font-normal: 400;
+  --dp-font-medium: 500;
+  --dp-font-semibold: 600;
+  --dp-font-bold: 700;
+
+  /* Line heights */
+  --dp-leading-none: 1;
+  --dp-leading-tight: 1.25;
+  --dp-leading-snug: 1.375;
+  --dp-leading-normal: 1.5;
+  --dp-leading-relaxed: 1.625;
+  --dp-leading-loose: 2;
+
+  /* Spacing */
+  --dp-space-1: 0.25rem;
+  --dp-space-2: 0.5rem;
+  --dp-space-3: 0.75rem;
+  --dp-space-4: 1rem;
+  --dp-space-5: 1.25rem;
+  --dp-space-6: 1.5rem;
+  --dp-space-8: 2rem;
+  --dp-space-10: 2.5rem;
+  --dp-space-12: 3rem;
+  --dp-space-16: 4rem;
+  --dp-space-20: 5rem;
+  --dp-space-24: 6rem;
+
+  /* Border radius */
+  --dp-radius-sm: 2px;
+  --dp-radius-md: 4px;
+  --dp-radius-lg: 8px;
+  --dp-radius-xl: 12px;
+  --dp-radius-2xl: 16px;
+  --dp-radius-full: 9999px;
+
+  /* Shadows */
+  --dp-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --dp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --dp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --dp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --dp-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --dp-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
+  /* Glow effects for futuristic style */
+  --dp-glow-primary: 0 0 20px rgba(0, 255, 255, 0.3);
+  --dp-glow-primary-strong: 0 0 40px rgba(0, 255, 255, 0.5);
+  --dp-glow-success: 0 0 20px rgba(16, 185, 129, 0.3);
+  --dp-glow-warning: 0 0 20px rgba(245, 158, 11, 0.3);
+  --dp-glow-error: 0 0 20px rgba(239, 68, 68, 0.3);
+  --dp-glow-info: 0 0 20px rgba(59, 130, 246, 0.3);
+
+  /* Transitions */
+  --dp-transition-fast: 150ms ease;
+  --dp-transition-normal: 250ms ease;
+  --dp-transition-slow: 350ms ease;
+
+  /* Z-index */
+  --dp-z-dropdown: 1000;
+  --dp-z-sticky: 1020;
+  --dp-z-fixed: 1030;
+  --dp-z-modal-backdrop: 1040;
+  --dp-z-modal: 1050;
+  --dp-z-popover: 1060;
+  --dp-z-tooltip: 1070;
+}
+
+/* Dark theme overrides (already dark by default) */
+.dark {
+  /* No changes needed as base is already dark */
+}
+
+/* Light theme overrides */
+.light {
+  --dp-bg-primary: #F8FAFC;
+  --dp-bg-secondary: #F1F5F9;
+  --dp-bg-tertiary: #E2E8F0;
+  --dp-bg-elevated: #FFFFFF;
+  --dp-bg-overlay: rgba(248, 250, 252, 0.8);
+  
+  --dp-text-primary: #0F172A;
+  --dp-text-secondary: #334155;
+  --dp-text-tertiary: #64748B;
+  --dp-text-muted: #94A3B8;
+  --dp-text-inverse: #F8FAFC;
+  
+  --dp-border-default: #E2E8F0;
+  --dp-border-strong: #CBD5E1;
+  --dp-border-subtle: #F1F5F9;
+  
+  --dp-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --dp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --dp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  
+  --dp-glow-primary: 0 0 20px rgba(0, 255, 255, 0.2);
+  --dp-glow-primary-strong: 0 0 40px rgba(0, 255, 255, 0.3);
+}

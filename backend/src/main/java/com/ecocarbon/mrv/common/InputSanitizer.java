@@ -8,7 +8,14 @@ public class InputSanitizer {
 
     private static final Pattern HTML_PATTERN = Pattern.compile("<[^>]*>");
     private static final Pattern SCRIPT_PATTERN = Pattern.compile("(?i)<script[^>]*>.*?</script>");
-    private static final Pattern SQL_INJECTION_PATTERN = Pattern.compile("(?i)(\\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\\b)");
+    private static final Pattern SQL_INJECTION_PATTERN = Pattern.compile(
+            "(?i)(\\b(UNION\\s+SELECT|SELECT\\s+.*\\s+FROM|INSERT\\s+INTO|UPDATE\\s+.*\\s+SET|DELETE\\s+FROM|DROP\\s+(TABLE|DATABASE)|ALTER\\s+TABLE)\\b)"
+            + "|(--|/\\*|\\*/)"
+            + "|(;\\s*(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER)\\b)"
+            + "|(\\b(OR|AND)\\s+\\d+\\s*=\\s*\\d+)"
+            + "|(\\b(OR|AND)\\s+'[^']*'\\s*=\\s*'[^']*')"
+            + "|('\\s*(OR|AND)\\s+')"
+    );
 
     public String sanitize(String input) {
         if (input == null) {

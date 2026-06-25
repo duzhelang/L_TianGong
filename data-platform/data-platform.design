@@ -1,0 +1,90 @@
+{
+  "data": [
+    {
+      "id": "page-dashboard",
+      "title": "仪表板",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782415351284,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/dashboard.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-data-analysis",
+      "title": "数据分析",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782415351284,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/data-analysis.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-reports",
+      "title": "报告",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782415351284,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/reports.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-settings",
+      "title": "设置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782415351284,
+      "canvasData": {
+        "x": 1860,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/settings.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-user-management",
+      "title": "用户管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782415351284,
+      "canvasData": {
+        "x": 2480,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/user-management.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "数据平台",
+    "designLibrary": null
+  }
+}
