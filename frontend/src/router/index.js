@@ -1,11 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { hasMenuPermission } from "@/utils/permission";
 
 const routes = [
   {
     path: "/login",
     name: "Login",
     component: () => import("@/views/auth/Login.vue"),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: () => import("@/views/auth/Register.vue"),
     meta: { requiresAuth: false },
   },
   {
@@ -68,6 +75,12 @@ const routes = [
         meta: { title: "环境监测" },
       },
       {
+        path: "carbon/trading",
+        name: "CarbonTrading",
+        component: () => import("@/views/carbon/CarbonTrading.vue"),
+        meta: { title: "碳交易平台", permission: "carbon:trading" },
+      },
+      {
         path: "carbon/sink-map",
         name: "CarbonSinkMap",
         component: () => import("@/views/carbon/CarbonSinkMap.vue"),
@@ -77,7 +90,37 @@ const routes = [
         path: "short-drama",
         name: "ShortDrama",
         component: () => import("@/views/short-drama/ShortDrama.vue"),
-        meta: { title: "短剧中心" },
+        meta: { title: "宣传中心" },
+      },
+      {
+        path: "data-screen",
+        name: "DataScreen",
+        component: () => import("@/views/dashboard/DataScreen.vue"),
+        meta: { title: "数据大屏" },
+      },
+      {
+        path: "iot",
+        name: "IoTDashboard",
+        component: () => import("@/views/iot/IoTDashboard.vue"),
+        meta: { title: "IoT 监测中心", requiresAuth: true },
+      },
+      {
+        path: "iot/devices",
+        name: "DeviceManagement",
+        component: () => import("@/views/iot/DeviceManagement.vue"),
+        meta: { title: "设备管理", requiresAuth: true },
+      },
+      {
+        path: "digital-twin",
+        name: "DigitalTwin",
+        component: () => import("@/views/digital-twin/DigitalTwin.vue"),
+        meta: { title: "数字孪生可视化", requiresAuth: true },
+      },
+      {
+        path: "ai/assistant",
+        name: "AiAssistant",
+        component: () => import("@/views/ai/AiAssistant.vue"),
+        meta: { title: "AI智能助手" },
       },
     ],
   },
@@ -91,13 +134,21 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const isAuthPage = to.name === "Login" || to.name === "Register";
 
   if (requiresAuth && !authStore.isAuthenticated) {
     next({ name: "Login" });
-  } else if (to.name === "Login" && authStore.isAuthenticated) {
+  } else if (isAuthPage && authStore.isAuthenticated) {
     next({ name: "Dashboard" });
   } else {
-    next();
+    // 检查菜单权限
+    const menuPath = to.path;
+    if (hasMenuPermission(menuPath)) {
+      next();
+    } else {
+      // 无权限时跳转到仪表盘
+      next({ name: "Dashboard" });
+    }
   }
 });
 

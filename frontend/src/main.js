@@ -8,6 +8,10 @@ import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import App from "./App.vue";
 import router from "./router";
 import "./style.css";
+import {
+  permissionDirective,
+  permissionDisabledDirective,
+} from "./directives/permission";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -15,6 +19,10 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 app.use(ElementPlus, { locale: zhCn });
+
+// 注册权限指令
+app.directive("permission", permissionDirective);
+app.directive("permission-disabled", permissionDisabledDirective);
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);

@@ -1,7 +1,7 @@
 <script setup>
 import { useAppStore } from "@/stores/app";
 import { useRoute, useRouter } from "vue-router";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   Odometer,
   DataLine,
@@ -15,13 +15,18 @@ import {
   Picture,
   Cloudy,
   VideoPlay,
+  Monitor,
+  TrendingUp,
+  ChatDotRound,
+  Management,
 } from "@element-plus/icons-vue";
+import { hasMenuPermission } from "@/utils/permission";
 
 const appStore = useAppStore();
 const route = useRoute();
 const router = useRouter();
 
-const menuItems = [
+const allMenuItems = [
   {
     path: "/",
     icon: Odometer,
@@ -82,6 +87,38 @@ const menuItems = [
     ],
   },
   {
+    path: "/iot",
+    icon: Monitor,
+    title: "IoT 监测中心",
+    children: [
+      {
+        path: "/iot",
+        icon: Monitor,
+        title: "监测总览",
+      },
+      {
+        path: "/iot/devices",
+        icon: Management,
+        title: "设备管理",
+      },
+    ],
+  },
+  {
+    path: "/carbon/trading",
+    icon: TrendingUp,
+    title: "碳交易平台",
+  },
+  {
+    path: "/ai/assistant",
+    icon: ChatDotRound,
+    title: "AI智能助手",
+  },
+  {
+    path: "/digital-twin",
+    icon: Monitor,
+    title: "数字孪生可视化",
+  },
+  {
     path: "/carbon/sink-map",
     icon: MapLocation,
     title: "碳汇一张图",
@@ -100,7 +137,7 @@ const menuItems = [
   {
     path: "/short-drama",
     icon: VideoPlay,
-    title: "短剧中心",
+    title: "宣传中心",
   },
   {
     path: "/settings",
@@ -109,6 +146,20 @@ const menuItems = [
     disabled: true,
   },
 ];
+
+// 根据权限过滤菜单项
+const menuItems = computed(() => {
+  return allMenuItems.filter((item) => {
+    if (item.disabled) return true;
+    if (item.children) {
+      const filteredChildren = item.children.filter((child) =>
+        hasMenuPermission(child.path)
+      );
+      return filteredChildren.length > 0;
+    }
+    return hasMenuPermission(item.path);
+  });
+});
 
 const activeMenu = computed(() => route.path);
 
