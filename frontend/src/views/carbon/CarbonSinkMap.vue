@@ -121,6 +121,14 @@ onMounted(() => {
 
 <template>
   <div class="carbon-sink-map" v-loading="loading">
+    <el-alert
+      title="演示模式"
+      description="当前显示为模拟数据，实际部署后将接入遥感监测与实地采样数据"
+      type="warning"
+      :closable="false"
+      show-icon
+      style="margin-bottom: 16px;"
+    />
     <div class="page-header">
       <div class="header-left">
         <h2>碳汇一张图</h2>

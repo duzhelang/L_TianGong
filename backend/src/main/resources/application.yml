@@ -25,6 +25,19 @@ spring:
 app:
   auth:
     token-ttl-minutes: 120
+  ai:
+    enabled: ${AI_ENABLED:true}
+    default-provider: openrouter
+    timeout-seconds: 30
+    providers:
+      openrouter:
+        base-url: https://openrouter.ai/api/v1
+        api-key: ${OPENROUTER_API_KEY:}
+        default-model: openai/gpt-4
+        models:
+          openai/gpt-4: "GPT-4"
+          anthropic/claude-3: "Claude 3"
+          google/gemini-pro: "Gemini Pro"
 
 external:
   api:

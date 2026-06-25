@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { ElMessage } from "element-plus";
@@ -11,6 +11,7 @@ const authStore = useAuthStore();
 const loginForm = reactive({
   username: "",
   password: "",
+  remember: false,
 });
 
 const loading = ref(false);
@@ -20,6 +21,14 @@ const rules = {
   username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
 };
+
+onMounted(() => {
+  const savedUsername = localStorage.getItem("remembered_username");
+  if (savedUsername) {
+    loginForm.username = savedUsername;
+    loginForm.remember = true;
+  }
+});
 
 async function handleLogin() {
   if (!loginFormRef.value) return;
@@ -32,18 +41,31 @@ async function handleLogin() {
 
   loading.value = true;
   try {
-    const result = await authStore.login(loginForm);
+    const result = await authStore.login({
+      username: loginForm.username,
+      password: loginForm.password,
+    });
     if (result.success) {
+      if (loginForm.remember) {
+        localStorage.setItem("remembered_username", loginForm.username);
+      } else {
+        localStorage.removeItem("remembered_username");
+      }
       ElMessage.success("登录成功");
       router.push("/");
     } else {
       ElMessage.error(result.message || "登录失败");
     }
   } catch (error) {
-    ElMessage.error("登录失败，请稍后重试");
+    const message = error?.response?.data?.message || "登录失败，请稍后重试";
+    ElMessage.error(message);
   } finally {
     loading.value = false;
   }
+}
+
+function goToRegister() {
+  router.push("/register");
 }
 </script>
 
@@ -84,6 +106,12 @@ async function handleLogin() {
         </el-form-item>
 
         <el-form-item>
+          <div class="login-options">
+            <el-checkbox v-model="loginForm.remember">记住密码</el-checkbox>
+          </div>
+        </el-form-item>
+
+        <el-form-item>
           <el-button
             type="primary"
             size="large"
@@ -94,6 +122,13 @@ async function handleLogin() {
             登录
           </el-button>
         </el-form-item>
+
+        <div class="login-footer">
+          <span>还没有账号？</span>
+          <el-link type="primary" underline="never" @click="goToRegister">
+            立即注册
+          </el-link>
+        </div>
       </el-form>
     </div>
   </div>
@@ -136,7 +171,25 @@ async function handleLogin() {
   width: 100%;
 }
 
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .login-button {
   width: 100%;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #909399;
+}
+
+.login-footer .el-link {
+  margin-left: 4px;
 }
 </style>

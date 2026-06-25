@@ -21,4 +21,8 @@ public class ExternalApiException extends RuntimeException {
     public ExternalApiException(String message, Throwable cause) {
         this(message, cause, -1, null);
     }
+
+    public ExternalApiException(String message) {
+        this(message, null, -1, null);
+    }
 }

@@ -12,4 +12,8 @@ public interface ActivityDataRepository extends JpaRepository<ActivityData, Long
     List<ActivityData> findByActivityCategory(String activityCategory);
     
     List<ActivityData> findByProjectIdAndDataType(Long projectId, String dataType);
+    
+    long countByProjectId(Long projectId);
+    
+    long countByDataType(String dataType);
 }

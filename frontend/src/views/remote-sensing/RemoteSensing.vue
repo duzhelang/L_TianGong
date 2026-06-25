@@ -171,7 +171,8 @@ onMounted(() => {
           <div class="map-placeholder">
             <el-icon :size="64" color="#C0C4CC"><MapLocation /></el-icon>
             <p>遥感监测地图区域</p>
-            <p class="map-hint">支持NDVI、NPP、土地利用等多图层叠加显示</p>
+            <p class="map-hint">待接入卫星遥感数据源，支持NDVI、NPP、土地利用等多图层叠加显示</p>
+            <el-tag type="warning" effect="plain" style="margin-top: 12px;">实地部署后接入</el-tag>
           </div>
         </div>
       </el-card>

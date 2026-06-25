@@ -31,7 +31,7 @@ public class IotAlarmRule {
     @Column(nullable = false, length = 32)
     private String metric;
 
-    @Column(nullable = false, length = 32)
+    @Column(name = "\"condition\"", nullable = false, length = 32)
     private String condition;
 
     @Column(nullable = false)

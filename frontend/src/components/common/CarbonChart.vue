@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, computed } from "vue";
+import { ref, onMounted, onUnmounted, watch, computed, nextTick } from "vue";
 import * as echarts from "echarts";
 
 const props = defineProps({
@@ -284,7 +284,9 @@ function handleResize() {
 }
 
 onMounted(() => {
-  initChart();
+  nextTick(() => {
+    initChart();
+  });
   window.addEventListener("resize", handleResize);
 });
 

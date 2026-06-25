@@ -13,4 +13,6 @@ public interface CarbonPriceRepository extends JpaRepository<CarbonPrice, Long> 
     List<CarbonPrice> findByProductCode(String productCode);
 
     CarbonPrice findTopByExchangeAndProductCodeOrderByPriceDateDesc(String exchange, String productCode);
+
+    List<CarbonPrice> findTop30ByOrderByPriceDateDescPriceTimeDesc();
 }

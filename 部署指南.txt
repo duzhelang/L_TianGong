@@ -1,0 +1,113 @@
+============================================
+       EcoCarbon-MRV 快速部署指南
+============================================
+
+一、环境准备
+--------------------------------------------
+1. 安装 Docker Desktop
+   下载地址: https://www.docker.com/products/docker-desktop
+
+2. 安装 Git
+   下载地址: https://git-scm.com/downloads
+
+
+二、部署步骤
+--------------------------------------------
+
+步骤1: 复制环境变量配置文件
+   复制 .env.example 为 .env
+   命令: copy .env.example .env
+
+步骤2: 修改环境变量配置
+   编辑 .env 文件，修改以下配置:
+   - AI_API_KEY: 填入您的AI服务API密钥
+   - AI_API_URL: AI服务接口地址
+
+步骤3: 启动所有服务
+   命令: docker-compose up -d
+   
+   该命令会启动以下服务:
+   - MySQL 8.0 数据库 (端口: 3306)
+   - Redis 7.x 缓存 (端口: 6379)
+   - Spring Boot 后端 (端口: 8080)
+   - Nginx 前端 (端口: 80)
+
+步骤4: 等待服务启动完成
+   查看服务状态: docker-compose ps
+   查看日志: docker-compose logs -f
+
+步骤5: 导入演示数据
+   命令: docker exec -i ecocarbon-mysql mysql -uroot -proot123456 ecocarbon < database_demo_data.sql
+
+步骤6: 访问系统
+   - 前端页面: http://localhost
+   - 后端API: http://localhost:8080
+   - API文档: http://localhost:8080/doc.html
+
+
+三、默认账号
+--------------------------------------------
+   用户名: admin
+   密码: 123456
+
+
+四、常用命令
+--------------------------------------------
+   查看服务状态:    docker-compose ps
+   启动服务:        docker-compose up -d
+   停止服务:        docker-compose down
+   查看日志:        docker-compose logs -f
+   重启服务:        docker-compose restart
+   重新构建并启动:  docker-compose up -d --build
+
+
+五、常见问题
+--------------------------------------------
+1. 端口被占用
+   解决: 修改 docker-compose.yml 中的端口映射
+
+2. MySQL启动失败
+   解决: 删除 mysql_data 卷后重新启动
+   命令: docker-compose down -v && docker-compose up -d
+
+3. 后端启动失败
+   解决: 检查数据库连接配置，确保MySQL已启动
+
+4. AI功能无法使用
+   解决: 检查 .env 文件中的 AI_API_KEY 配置
+
+
+六、本地开发模式（不使用Docker）
+--------------------------------------------
+
+1. 后端启动
+   cd backend
+   mvn spring-boot:run
+
+2. 前端启动
+   cd frontend
+   npm install
+   npm run dev
+
+3. 访问地址
+   前端: http://localhost:5173
+   后端: http://localhost:8080
+
+
+七、停止并清理
+--------------------------------------------
+   停止服务: docker-compose down
+   停止并删除数据: docker-compose down -v
+   停止并删除镜像: docker-compose down --rmi all
+
+
+============================================
+       版本信息
+============================================
+   后端框架: Spring Boot 3.3.5
+   前端框架: Vue 3.5 + Vite 6.x
+   数据库: MySQL 8.0
+   缓存: Redis 7.x
+   Java版本: JDK 17
+   Node版本: 18.x
+============================================

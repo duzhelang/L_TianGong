@@ -61,6 +61,14 @@ onMounted(() => {
 
 <template>
   <div class="carbon-map">
+    <el-alert
+      title="演示数据"
+      description="当前显示为模拟监测点，实际部署后将接入GPS定位的实地监测设备"
+      type="info"
+      :closable="false"
+      show-icon
+      style="margin-bottom: 12px;"
+    />
     <div class="map-header">
       <h4>碳分布地图</h4>
       <div class="map-legend">

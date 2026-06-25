@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, markRaw } from "vue";
 import { useCarbonStore } from "@/stores/carbon";
 import { useRouter } from "vue-router";
 import CarbonChart from "@/components/common/CarbonChart.vue";
@@ -14,19 +14,30 @@ import {
   Document,
   DataLine,
   Cpu,
+  Warning,
 } from "@element-plus/icons-vue";
 
 const carbonStore = useCarbonStore();
 const router = useRouter();
 
 const loading = ref(false);
+const dataUpdateTime = ref(formatDateTime(new Date()));
+
+function formatDateTime(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
 
 const stats = ref([
   {
     title: "碳排放总量",
     value: 12450,
     unit: "tCO2e",
-    icon: Cloudy,
+    icon: markRaw(Cloudy),
     color: "#409EFF",
     trend: -5.2,
     description: "较去年同期",
@@ -35,7 +46,7 @@ const stats = ref([
     title: "范围一排放",
     value: 8200,
     unit: "tCO2e",
-    icon: TrendCharts,
+    icon: markRaw(TrendCharts),
     color: "#E6A23C",
     trend: -3.8,
     description: "直接排放",
@@ -44,7 +55,7 @@ const stats = ref([
     title: "范围二排放",
     value: 3100,
     unit: "tCO2e",
-    icon: TrendCharts,
+    icon: markRaw(TrendCharts),
     color: "#F56C6C",
     trend: -8.1,
     description: "间接排放",
@@ -53,7 +64,7 @@ const stats = ref([
     title: "范围三排放",
     value: 1150,
     unit: "tCO2e",
-    icon: TrendCharts,
+    icon: markRaw(TrendCharts),
     color: "#67C23A",
     trend: -12.5,
     description: "其他间接排放",
@@ -171,7 +182,7 @@ function getNotificationIcon(type) {
     info: Document,
     danger: Warning,
   };
-  return map[type] || Bell;
+  return markRaw(map[type] || Bell);
 }
 
 function getNotificationColor(type) {
@@ -215,7 +226,7 @@ onMounted(async () => {
         <p>碳排放概览与数据统计</p>
       </div>
       <div class="header-time">
-        数据更新时间: 2024-06-15 14:30
+        数据更新时间: {{ dataUpdateTime }}
       </div>
     </div>
 

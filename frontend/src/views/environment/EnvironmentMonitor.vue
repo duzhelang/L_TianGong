@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, shallowRef, onMounted, computed } from "vue";
 import { useCarbonStore } from "@/stores/carbon";
 import {
   Sunny,
@@ -19,7 +19,7 @@ const carbonStore = useCarbonStore();
 const loading = ref(false);
 const activeTab = ref("parameters");
 
-const environmentParams = ref([
+const environmentParams = shallowRef([
   { name: "温度", value: 25.6, unit: "°C", icon: Sunny, color: "#F56C6C", trend: 2.1, status: "normal" },
   { name: "湿度", value: 68.2, unit: "%", icon: Umbrella, color: "#409EFF", trend: -1.5, status: "normal" },
   { name: "土壤温度", value: 18.3, unit: "°C", icon: Cloudy, color: "#E6A23C", trend: 0.8, status: "normal" },
@@ -100,6 +100,14 @@ onMounted(() => {
 
 <template>
   <div class="environment-monitor" v-loading="loading">
+    <el-alert
+      title="演示模式"
+      description="当前显示为模拟数据，实际部署后将接入环境传感器实时数据"
+      type="warning"
+      :closable="false"
+      show-icon
+      style="margin-bottom: 16px;"
+    />
     <div class="page-header">
       <div class="header-left">
         <h2>环境监测</h2>

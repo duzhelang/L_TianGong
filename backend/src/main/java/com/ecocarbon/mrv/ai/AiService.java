@@ -1,5 +1,11 @@
 package com.ecocarbon.mrv.ai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +21,9 @@ public class AiService {
 
     @Autowired
     private AiClient aiClient;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public String chat(String systemPrompt, String userMessage) {
         if (!config.isEnabled()) {
@@ -118,44 +127,332 @@ public class AiService {
     }
 
     private String buildReductionPrompt(Map<String, Object> data) {
-        return "碳排放数据：" + data.toString() + "\n请提供减排建议。";
+        return String.format("""
+            碳排放数据：%s
+            
+            请提供减排建议，必须按照以下JSON格式返回：
+            {
+              "suggestions": [
+                {
+                  "category": "类别",
+                  "title": "建议标题",
+                  "description": "详细描述",
+                  "potentialReduction": 数值,
+                  "unit": "tCO2e",
+                  "difficulty": "高/中/低",
+                  "paybackPeriod": "投资回收期"
+                }
+              ]
+            }
+            """, data.toString());
     }
 
     private String buildPredictionPrompt(List<Map<String, Object>> data, int periods) {
-        return "历史数据：" + data.toString() + "\n预测未来" + periods + "期的碳排放。";
+        return String.format("""
+            历史数据：%s
+            
+            请预测未来%d期的碳排放，必须按照以下JSON格式返回：
+            {
+              "predictions": [
+                {
+                  "period": "时期",
+                  "value": 数值,
+                  "confidence": 置信度
+                }
+              ],
+              "trend": "趋势描述"
+            }
+            """, data.toString(), periods);
     }
 
     private String buildAnomalyPrompt(Map<String, Object> data) {
-        return "监测数据：" + data.toString() + "\n请检测异常。";
+        return String.format("""
+            监测数据：%s
+            
+            请检测数据中的异常情况，必须按照以下JSON格式返回：
+            {
+              "anomalies": [
+                {
+                  "timestamp": "时间戳",
+                  "metric": "指标名称",
+                  "actualValue": 实际值,
+                  "expectedValue": 预期值,
+                  "deviation": 偏差值,
+                  "severity": "严重程度",
+                  "description": "异常描述"
+                }
+              ]
+            }
+            """, data.toString());
     }
 
     private String buildReportPrompt(Map<String, Object> data) {
         return "项目数据：" + data.toString() + "\n请生成碳排放分析报告。";
     }
 
+    /**
+     * 解析AI返回的减排建议
+     * 支持JSON格式和文本格式的降级处理
+     */
     private List<CarbonReductionSuggestion> parseSuggestions(String response) {
+        if (response == null || response.isEmpty()) {
+            log.warn("AI响应为空，返回默认建议");
+            return getDefaultSuggestions();
+        }
+
+        try {
+            // 尝试解析JSON格式
+            JsonNode root = objectMapper.readTree(response);
+            if (root.isArray()) {
+                return parseSuggestionsFromArray(root);
+            } else if (root.has("suggestions")) {
+                return parseSuggestionsFromArray(root.get("suggestions"));
+            } else if (root.has("data")) {
+                return parseSuggestionsFromArray(root.get("data"));
+            }
+            
+            // 如果JSON格式不符合预期，尝试解析文本格式
+            return parseSuggestionsFromText(response);
+            
+        } catch (JsonProcessingException e) {
+            log.warn("AI响应JSON解析失败，尝试文本解析: {}", e.getMessage());
+            return parseSuggestionsFromText(response);
+        } catch (Exception e) {
+            log.error("解析AI建议失败: {}", e.getMessage(), e);
+            return getDefaultSuggestions();
+        }
+    }
+
+    /**
+     * 从JSON数组解析减排建议
+     */
+    private List<CarbonReductionSuggestion> parseSuggestionsFromArray(JsonNode arrayNode) {
+        List<CarbonReductionSuggestion> suggestions = new ArrayList<>();
+        for (JsonNode item : arrayNode) {
+            try {
+                CarbonReductionSuggestion suggestion = CarbonReductionSuggestion.builder()
+                        .category(getTextValue(item, "category", "通用"))
+                        .title(getTextValue(item, "title", "未命名建议"))
+                        .description(getTextValue(item, "description", ""))
+                        .potentialReduction(getDoubleValue(item, "potentialReduction", 0.0))
+                        .unit(getTextValue(item, "unit", "tCO2e"))
+                        .difficulty(getTextValue(item, "difficulty", "中"))
+                        .paybackPeriod(getTextValue(item, "paybackPeriod", ""))
+                        .build();
+                suggestions.add(suggestion);
+            } catch (Exception e) {
+                log.warn("解析单条建议失败: {}", e.getMessage());
+            }
+        }
+        return suggestions.isEmpty() ? getDefaultSuggestions() : suggestions;
+    }
+
+    /**
+     * 从文本格式解析减排建议
+     */
+    private List<CarbonReductionSuggestion> parseSuggestionsFromText(String text) {
+        List<CarbonReductionSuggestion> suggestions = new ArrayList<>();
+        String[] lines = text.split("\n");
+        
+        for (String line : lines) {
+            if (line.contains("建议") || line.contains("推荐") || line.contains("优化")) {
+                suggestions.add(CarbonReductionSuggestion.builder()
+                        .category("文本解析")
+                        .title(line.trim())
+                        .description("从AI文本响应中提取")
+                        .potentialReduction(0.0)
+                        .difficulty("未知")
+                        .build());
+            }
+        }
+        
+        return suggestions.isEmpty() ? getDefaultSuggestions() : suggestions;
+    }
+
+    /**
+     * 获取默认的减排建议
+     */
+    private List<CarbonReductionSuggestion> getDefaultSuggestions() {
         return List.of(
                 CarbonReductionSuggestion.builder()
-                        .category("能源优化")
-                        .title("推广电动设备")
-                        .description("将传统燃油设备替换为电动设备，可减少燃料燃烧排放")
-                        .potentialReduction(100.0)
+                        .category("默认建议")
+                        .title("优化能源结构")
+                        .description("建议增加可再生能源比例，减少化石能源使用")
+                        .potentialReduction(50.0)
                         .difficulty("中")
                         .build()
         );
     }
 
+    /**
+     * 解析AI返回的排放预测
+     * 支持JSON格式和文本格式的降级处理
+     */
     private EmissionPrediction parsePrediction(String response) {
+        if (response == null || response.isEmpty()) {
+            log.warn("AI响应为空，返回默认预测");
+            return getDefaultPrediction();
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(response);
+            
+            // 支持多种JSON格式
+            JsonNode predictionsNode = null;
+            if (root.has("predictions")) {
+                predictionsNode = root.get("predictions");
+            } else if (root.has("data")) {
+                predictionsNode = root.get("data");
+            } else if (root.isArray()) {
+                predictionsNode = root;
+            }
+
+            if (predictionsNode != null && predictionsNode.isArray()) {
+                List<Map<String, Object>> predictions = new ArrayList<>();
+                for (JsonNode item : predictionsNode) {
+                    Map<String, Object> prediction = new HashMap<>();
+                    prediction.put("period", getTextValue(item, "period", "未知"));
+                    prediction.put("value", getDoubleValue(item, "value", 0.0));
+                    prediction.put("confidence", getDoubleValue(item, "confidence", 0.5));
+                    predictions.add(prediction);
+                }
+
+                return EmissionPrediction.builder()
+                        .predictions(predictions)
+                        .trend(getTextValue(root, "trend", "稳定"))
+                        .confidence(getTextValue(root, "confidence", "中"))
+                        .build();
+            }
+
+            // 文本格式降级处理
+            return parsePredictionFromText(response);
+
+        } catch (JsonProcessingException e) {
+            log.warn("AI预测JSON解析失败，尝试文本解析: {}", e.getMessage());
+            return parsePredictionFromText(response);
+        } catch (Exception e) {
+            log.error("解析AI预测失败: {}", e.getMessage(), e);
+            return getDefaultPrediction();
+        }
+    }
+
+    /**
+     * 从文本格式解析排放预测
+     */
+    private EmissionPrediction parsePredictionFromText(String text) {
         return EmissionPrediction.builder()
                 .predictions(List.of(
-                        Map.of("period", "2025", "value", 1050.0, "confidence", 0.85),
-                        Map.of("period", "2026", "value", 1020.0, "confidence", 0.75)
+                        Map.of("period", "下期", "value", 1000.0, "confidence", 0.6, "source", "文本解析")
                 ))
-                .trend("下降")
+                .trend("基于文本分析")
+                .confidence("低")
                 .build();
     }
 
+    /**
+     * 获取默认的排放预测
+     */
+    private EmissionPrediction getDefaultPrediction() {
+        return EmissionPrediction.builder()
+                .predictions(List.of(
+                        Map.of("period", "2025", "value", 1000.0, "confidence", 0.5, "source", "默认值")
+                ))
+                .trend("稳定")
+                .confidence("低")
+                .build();
+    }
+
+    /**
+     * 解析AI返回的异常检测结果
+     * 支持JSON格式和文本格式的降级处理
+     */
     private List<AnomalyDetection> parseAnomalies(String response) {
-        return List.of();
+        if (response == null || response.isEmpty()) {
+            log.warn("AI响应为空，返回空异常列表");
+            return List.of();
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(response);
+            
+            JsonNode anomaliesNode = null;
+            if (root.has("anomalies")) {
+                anomaliesNode = root.get("anomalies");
+            } else if (root.has("data")) {
+                anomaliesNode = root.get("data");
+            } else if (root.isArray()) {
+                anomaliesNode = root;
+            }
+
+            if (anomaliesNode != null && anomaliesNode.isArray()) {
+                List<AnomalyDetection> anomalies = new ArrayList<>();
+                for (JsonNode item : anomaliesNode) {
+                    try {
+                        AnomalyDetection anomaly = AnomalyDetection.builder()
+                                .timestamp(getTextValue(item, "timestamp", LocalDateTime.now().toString()))
+                                .metric(getTextValue(item, "metric", "未知指标"))
+                                .actualValue(getDoubleValue(item, "actualValue", 0.0))
+                                .expectedValue(getDoubleValue(item, "expectedValue", 0.0))
+                                .deviation(getDoubleValue(item, "deviation", 0.0))
+                                .severity(getTextValue(item, "severity", "中"))
+                                .description(getTextValue(item, "description", ""))
+                                .build();
+                        anomalies.add(anomaly);
+                    } catch (Exception e) {
+                        log.warn("解析单条异常记录失败: {}", e.getMessage());
+                    }
+                }
+                return anomalies;
+            }
+
+            // 文本格式降级处理
+            return parseAnomaliesFromText(response);
+
+        } catch (JsonProcessingException e) {
+            log.warn("AI异常检测JSON解析失败，尝试文本解析: {}", e.getMessage());
+            return parseAnomaliesFromText(response);
+        } catch (Exception e) {
+            log.error("解析AI异常检测失败: {}", e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    /**
+     * 从文本格式解析异常检测结果
+     */
+    private List<AnomalyDetection> parseAnomaliesFromText(String text) {
+        List<AnomalyDetection> anomalies = new ArrayList<>();
+        if (text.toLowerCase().contains("异常") || text.toLowerCase().contains("anomaly")) {
+            anomalies.add(AnomalyDetection.builder()
+                    .timestamp(LocalDateTime.now().toString())
+                    .metric("文本检测")
+                    .actualValue(0.0)
+                    .expectedValue(0.0)
+                    .deviation(0.0)
+                    .severity("低")
+                    .description("从AI文本响应中发现异常提及")
+                    .build());
+        }
+        return anomalies;
+    }
+
+    /**
+     * 辅助方法：安全获取文本值
+     */
+    private String getTextValue(JsonNode node, String fieldName, String defaultValue) {
+        if (node.has(fieldName)) {
+            return node.get(fieldName).asText(defaultValue);
+        }
+        return defaultValue;
+    }
+
+    /**
+     * 辅助方法：安全获取数值
+     */
+    private Double getDoubleValue(JsonNode node, String fieldName, Double defaultValue) {
+        if (node.has(fieldName)) {
+            return node.get(fieldName).asDouble(defaultValue);
+        }
+        return defaultValue;
     }
 }

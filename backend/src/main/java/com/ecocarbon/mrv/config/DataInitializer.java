@@ -29,11 +29,15 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.findByUsername("admin").isEmpty()) {
-            User admin = new User();
+        User admin = userRepository.findByUsername("admin").orElse(null);
+        if (admin == null) {
+            admin = new User();
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("123456"));
             admin.setRole("ADMIN");
+            userRepository.save(admin);
+        } else if (!passwordEncoder.matches("123456", admin.getPassword())) {
+            admin.setPassword(passwordEncoder.encode("123456"));
             userRepository.save(admin);
         }
 

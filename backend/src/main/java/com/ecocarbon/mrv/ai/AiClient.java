@@ -18,9 +18,9 @@ public class AiClient {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public AiClient() {
-        this.restTemplate = new RestTemplate();
-        this.objectMapper = new ObjectMapper();
+    public AiClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public String callChatCompletion(String baseUrl, String apiKey, String model,
